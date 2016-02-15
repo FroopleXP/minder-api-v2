@@ -1,0 +1,45 @@
+extends base
+
+block body
+	.container
+		.row
+			.col-lg-3
+			.col-lg-6
+				.panel.panel-default(style='margin-top: 50px;')
+					.panel-heading
+						h4 Register your organisation
+					.panel-body
+						form(id="register")
+							.form-group
+								label(for='org-name') Organisation Name: 
+								input.form-control(type='text', name='org_name', placeholder='Organisation Name', autocomplete='off' required)
+								hr
+					
+							.form-group
+								label(for='fname') Firstname: 
+								input.form-control(type='text', name='fname', placeholder='Firstname', autocomplete='off' required)
+
+							.form-group
+								label(for='lname') Lastname: 
+								input.form-control(type='text', name='lname', placeholder='Lastname', autocomplete='off' required)
+
+							.form-group
+								label(for='email') Email: 
+								input.form-control(type='email', name='email', placeholder='Email', autocomplete='off' required)
+
+							.form-group
+								label(for="password") Password:
+								input.form-control(type="password", name="password", placeholder="Password", autocomplete='off' required)
+
+							.form-group
+								label(for="password_conf") Password:
+								input.form-control(type="password", name="password_conf", placeholder="Confirm Password", autocomplete='off' required)
+
+							.form-group
+								button.btn.pull-right.btn-primary(type="submit") Sign Up
+			.col-lg-3
+
+	// Including the JavaScript
+	script(type='text/javascript' src='views/scripts/register.js')
+
+block footer

@@ -1,0 +1,20 @@
+block vars
+doctype html
+html
+	head
+		title Minder | #{title}
+	body
+		script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js')
+		link(href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.0/flatly/bootstrap.min.css", rel="stylesheet")
+
+		// Main body
+		block body
+
+		// Footer to add to each page
+		block footer
+		hr 
+		small 
+			center
+				b Minder</b> - Written and Developed by: <a href="https://twitter.com/4v3ng3dFoREVer" target="_blank">Connor Edwards</a>
+				br
+				p &copy; Noval Technologies, 2015
