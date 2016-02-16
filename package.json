@@ -1,15 +1,31 @@
 {
   "name": "minder-api",
   "version": "1.0.0",
-  "description": "The API for Minder",
+  "description": "Official Minder API",
   "main": "app.js",
+  "dependencies": {
+    "bcryptjs": "~2.3.0",
+    "express": "~4.13.4",
+    "mysql": "~2.10.2",
+    "jade": "~1.11.0",
+    "bcrypt-nodejs": "~0.0.3",
+    "path": "~0.12.7",
+    "validator": "~4.8.0",
+    "body-parser": "~1.15.0",
+    "sanitize-html": "~1.11.3",
+    "xss-filters": "~1.2.6"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FroopleXP/minder-api-v2.git"
+  },
   "author": "Connor Edwards",
   "license": "BSD-2-Clause",
-  "dependencies": {
-    "xss-filters": "~1.2.6",
-    "mysql": "~2.10.2"
+  "bugs": {
+    "url": "https://github.com/FroopleXP/minder-api-v2/issues"
   }
 }

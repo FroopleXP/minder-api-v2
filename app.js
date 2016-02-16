@@ -12,12 +12,15 @@ var bodyParser = require('body-parser');
 var xssFilters = require('xss-filters'),
 	validator = require('validator');
 
-// MySQL
+// MySQL Config file
 try {
 	var db = require('./mysql_conn.js');
 } catch (err) {
 	console.log("Couldn't find the MySQL config file.");
 }
+
+// bCrypt
+var bcrypt = require('bcryptjs');
 
 /////////////////////////////////////////////
 // SETTING UP THE APPLICATION (MIDDLEWARE)
@@ -39,6 +42,61 @@ var vali_str_opt = {
 // Home Page
 app.get('/', function(req, res) {
 	res.render('index.jade', {title: "Home"});
+});
+
+// Login Page
+app.get('/login', function(req, res) {
+	res.render('login.jade', {title: "Login"});
+});
+
+app.post('/login', function(req, res) {
+
+	// Getting the data from the form
+	var email = xssFilters.inHTMLData(req.body.form_data.email),
+		password = xssFilters.inHTMLData(req.body.form_data.password);
+
+	// Validating the data
+	if (!validator.isEmail(email)) {
+		res.json({
+			stat: 0,
+			message: "Invalid Email"
+		});
+	} else if (!validator.isLength(password, vali_str_opt)) {
+		res.json({
+			stat: 0,
+			message: "Invalid Password"
+		});			
+	} else {
+
+		// Checking if the User exists in the database
+		db.query('SELECT * FROM admin_users WHERE admin_users.email = ?', email, function(err, rows, fields) {
+			if (err) throw err;
+			// Checking if that email exists
+			if (rows.length < 1) {
+				// Doesn't exist
+				res.json({
+					stat: 0,
+					message: "That Email has not been registered."
+				});	
+			} else if (rows.length > 0) {
+				// Does exist, check the password
+				var password_db = rows[0]['password'];
+				// Checking the password
+				if (bcrypt.compareSync(password, password_db)) {
+					// Password is correct
+					console.log("Correct");
+				} else {
+					// Password is incorrect
+					res.json({
+						stat: 0,
+						message: "Your password is incorrect"
+					});	
+				}
+			}
+		});
+
+	}
+
 });
 
 // Register Page
@@ -83,15 +141,102 @@ app.post('/register', function(req, res) {
 			message: "Passwords do not match"
 		});			
 	} else {
-		res.json({
-			stat: 1,
-			message: "Valid!"
-		});			
+
+		// Checking the database if the User exists
+		db.query('SELECT admin_users.id FROM admin_users WHERE admin_users.email = ?', email, function(err, rows, fields) {
+			if (err) throw err; // Throwing the error to the Console
+			// Checking if user exists
+			if (rows.length < 1) {
+				
+				// Checking if that establishment exists
+				db.query('SELECT establishments.estab_id FROM establishments WHERE estab_name = ?', org_name, function(err, rows, fields) {
+					// Check if any data was returned
+					if (err) throw err; // Throwing MySQL error
+					if (rows.length < 1) {
+
+						// Encrypting password
+						var password_hash = bcrypt.hashSync(password, bcrypt.genSaltSync(10)),
+							name_com = firstname + " " + lastname;
+
+						// Preparing the object to insert
+						var user_model = {
+							id: null,
+							fname: firstname,
+							lname: lastname,
+							full_name: name_com,
+							email: email,
+							password: password_hash,
+							estab_belongs_to: null
+						}
+
+						// Inserting the user
+						var user_ins = db.query('INSERT INTO admin_users SET ?', user_model, function(err, result) {
+							if (err) throw err; // Throwing error, if there is one
+							// Generating a password for the establishment
+							var user_id = result.insertId,
+								org_pass = gen_code(user_id);
+
+							// Inserting the new establishment into the Database
+							// Preparing the estab model
+							var estab_model = {
+								estab_id: null,
+								estab_pass: org_pass,
+								estab_name: org_name
+							}
+
+							// Inserting into database
+							var estab_ins = db.query('INSERT INTO establishments SET ?', estab_model, function(err, result) {
+								if (err) throw err; // Throwing error, if there is one
+								// Success! The establishment has been inserted, now we add the user to it
+								var estab_id = result.insertId;
+								var add_user = db.query('UPDATE admin_users SET admin_users.estab_belongs_to = ? WHERE admin_users.id = ?', [estab_id, user_id], function(err, result) {
+									if (err) throw err; // Throwing error, if there is one
+									// We've successfully added the User to the establishment
+
+									// Redirecting them to the reg success poage
+									res.json({
+										stat: 1,
+										message: "You've successfully registered! <a href='/login'>Login</a>"
+									});	
+
+								});
+		
+							});
+
+						});
+
+					} else if (rows.length > 0) {
+
+						// Establishment exists
+						res.json({
+							stat: 0,
+							message: "An establishment with that name exists, try another."
+						});		
+
+					}
+				});				
+
+			} else if (rows.length > 0) {
+				// User already registered
+				res.json({
+					stat: 0,
+					message: "Sorry, that email has already been registered."
+				});	
+			}
+		});
 	}
-
-	// Checking the database if the User exists
-
+	
 });
+
+// Function for generating the code
+function gen_code(user_id) {
+	// Generating code
+	var new_id = user_id * 1000000,
+		code = new_id.toString(36),
+		code_sub = code.substring(0, 5);
+	// Returning new Code
+	return code_sub;
+}
 
 // Setting the port for the application to run on
 app.listen(3000);

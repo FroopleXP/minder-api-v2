@@ -3,9 +3,10 @@ extends base
 block body
 	.container
 		.row
-			.col-lg-3
-			.col-lg-6
-				.panel.panel-default(style='margin-top: 50px;')
+			.col-lg-4
+			.col-lg-4
+				div(id="show_noti", class="alert" style="margin-top: 20px;")
+				.panel.panel-default(style='margin-top: 20px;')
 					.panel-heading
 						h4 Register your organisation
 					.panel-body
@@ -36,8 +37,9 @@ block body
 								input.form-control(type="password", name="password_conf", placeholder="Confirm Password", autocomplete='off' required)
 
 							.form-group
-								button.btn.pull-right.btn-primary(type="submit") Sign Up
-			.col-lg-3
+								button.btn.pull-right.btn-primary(type="submit", id="reg_btn") Register
+
+			.col-lg-4
 
 	// Including the JavaScript
 	script(type='text/javascript' src='views/scripts/register.js')

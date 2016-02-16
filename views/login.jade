@@ -1,0 +1,29 @@
+extends base
+
+block body
+	.contrainer
+		.row
+			.col-lg-4
+			.col-lg-4
+				div(id="show_noti", class="alert" style="margin-top: 20px;")
+				.panel.panel-default(style="margin-top: 20px")
+					.panel-heading
+						h4 Login to Minder
+					.panel-body
+						form(id="login")
+							.form-group
+								label Email
+								input.form-control(type='email', name='email', placeholder='Email', autocomplete='off' required)
+
+							.form-group
+								label Password
+								input.form-control(type="password", name="password", placeholder="Password", autocomplete="off" required)
+
+							.form-group
+								button.btn.btn-primary.pull-right(type="submit", id="login_btn") Login
+			.col-lg-4
+
+	// Including the JavaScript
+	script(type='text/javascript' src='views/scripts/login.js')
+
+block footer
